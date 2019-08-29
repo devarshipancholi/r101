@@ -1,0 +1,22 @@
+---
+title: "How to install necessary packages in RStudio"
+author: "Devarshi Pancholi"
+date: "7/25/2019"
+output:
+  pdf_document: default
+  word_document: default
+---
+
+***Installing the package using R commands:***
+
+>To install a package which you don't already have, put the following line of code with respective package name in RStudio Console:
+
+Note: Here, we will install a package called "ggplot2" which is used for graphical representation of data.
+
+
+```{r}
+
+install.packages("ggplot2", repos = "http://cran.us.r-project.org")
+
+```
+

@@ -1,0 +1,135 @@
+---
+title: "Tutorial on Multiple Regression"
+author: "Devarshi Pancholi"
+date: "7/29/2019"
+output: pdf_document
+---
+## R Markdown
+
+**Task:** The purpose of this analysis/tutorial is to use multiple regression to accurately forecast cost to advertize in a magazine based on various attributes in our AdCost dataset.
+
+The Steps we will take are:
+
+1) Load the dataset in RStudio and have a look at the data.
+
+2) Look at the scatterplot based on the dataset.
+
+3) Check the correlation between variables.
+
+4) Build the multiple regression model.
+
+5) Plot the original data and the regression line.
+
+6) Plot the standardized residuals vs. fitted values.
+
+**Part 1: Load the libraries and dataset in RStudio.**
+
+```{r message= FALSE}
+#loading the libraries we will use for this exercise
+library(readr)
+library(ggplot2)
+
+#loading the dataset in RStudio
+AdCost<-read_csv(file= "/Users/devarshipancholi/Desktop/AdCost.csv")
+```
+
+Now lets have a look at our dataset
+
+```{r}
+
+#printing the data to the pdf file
+print(AdCost)
+
+```
+
+**Part 2: Look at the scatterplot.**
+
+To plot the regression line  and scatterplot, I have used the library ggplot which we loaded in the beginning:
+
+```{r}
+
+# command for loading the plot and assigning the axis + plotting the points on graph in blue
+# y-axis denotes our dependent variable while x-axis denotes all independent variables combined
+
+ggplot(data= AdCost, aes(x= audience+male+income, y= pagecost)) + geom_point(color= 'blue')
+
+```
+
+**Part 3: Checking the co-relation **
+
+```{r}
+
+# removing the non numeric data from our analysis
+
+all = AdCost[,2:5]
+
+# 'all.obs' is used here as there are no missing data.
+# 'pearson' method is used as our data is linear and normally distributed
+
+cor(all, use="all.obs", method="pearson")
+
+```
+
+**Part 4:Build the multiple regression model.**
+
+```{r}
+
+# multiple regression model stored in the variable mamed "linearRegModel"
+
+MultipleRegModel<- lm(pagecost ~ audience+male+income, data= AdCost)
+print(MultipleRegModel)
+
+```
+
+Next, we get the summary for our regression model. This function allows us to observe a number of values like R-Squared, t-values and p-values for our independent varialbes.
+
+```{r}
+
+#getting the summary
+summary(MultipleRegModel)
+
+```
+
+Here's how you can obtain the anova output if needed:
+
+```{r}
+
+anova(MultipleRegModel)
+
+```
+
+***Part 5: Plot the original data and the linear regression line.***
+
+We will again use the library ggplot2 to add the regression line
+```{r warning= FALSE}
+
+# assigning the dataset
+data(AdCost)
+
+# deciding on X and Y axis + plotting the points on graph in blue
+p1 = ggplot( data= AdCost,aes( x= audience+male+income,y= pagecost)) + geom_point( color= 'blue')
+
+# plotting the regression line through the points
+p1 + geom_smooth( method= 'lm', se= F, col= "red")
+
+
+```
+
+***Part 6: Plot the standardized residuals vs. fitted values.***
+
+```{r}
+
+# obtaining standard residuals
+MultipleRegModel.StdRes <- rstandard(MultipleRegModel)
+
+# obtaining fitted values
+MultipleRegModel.Fit <- fitted.values(MultipleRegModel)
+
+# deciding on X and Y axis + plotting the points on graph in blue
+p3=ggplot(data=AdCost,aes(x=MultipleRegModel.Fit,y=MultipleRegModel.StdRes))+geom_point(color='blue')
+
+# plotting the best fitting line through the points in red 
+p3 + geom_smooth( method= 'lm', se= F, col= "red")
+
+```
+

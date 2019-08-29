@@ -1,0 +1,131 @@
+---
+title: "Simple Regression Tutorial"
+author: "Devarshi Pancholi"
+date: "7/5/2019"
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: inline
+---
+
+## R Markdown
+
+**Task:** The purpose of this analysis/tutorial is to use simple regression to accurately forecast Sales based on the Ad Expenditure in our AdExp dataset
+
+The Steps we will take are:
+
+1) Load the dataset in RStudio and have a look at the data.
+
+2) Look at the scatterplot for Sales vs Expenditure.
+
+3) Check the correlation between variables.
+
+4) Build the linear regression model.
+
+5) Plot the original data and the regression line.
+
+6) Plot the standardized residuals vs. fitted values.
+
+**Part 1: Load the libraries and dataset in RStudio.**
+
+```{r message= FALSE}
+#loading the libraries we will use for this exercise
+library(readr)
+library(ggplot2)
+
+#loading the dataset in RStudio
+AdExp<-read_csv(file= "/Users/devarshipancholi/Desktop/AdExp.csv")
+```
+
+Now lets have a look at our dataset
+
+```{r}
+
+#printing the data to the pdf file
+print(AdExp)
+
+```
+
+**Part 2: Look at the scatterplot for Sales vs Expenditure.**
+#the values are in 000's
+
+To plot the regression line  and scatterplot, I have used the library ggplot which we loaded in the beginning:
+
+```{r AdExp}
+
+# command for loading the plot and assigning the axis + plotting the points on graph in blue
+
+ggplot(data= AdExp, aes(x= advtexp,y= sales)) + geom_point(color= 'blue')
+
+```
+As we can see, the graph looks roughly linear.
+
+**Part 3: Checking the co-relation **
+
+```{r}
+
+# 'all.obs' is used here as there are no missing data.
+# 'pearson' method is used as our data is linear and normally distributed
+
+cor(AdExp, use="all.obs", method="pearson") 
+
+```
+
+**Part 4:Build the linear regression model.**
+
+The lm() function is used here to build linear regression models for comparison (sales vs. advtexp). summary() is used for the model to get the R-Squared values.
+
+```{r}
+
+# simple regression model stored in the variable mamed "linearRegModel"
+
+linearRegModel<- lm(sales ~ advtexp, data= AdExp)
+print(linearRegModel)
+
+```
+Next, we get the summary for our regression model. This function allows us to observe a number of values like R-Squared, t-values and p-values for our varialbe "advtexp".
+
+```{r}
+
+#getting the summary
+summary(linearRegModel)
+
+```
+
+***Part 5: Plot the original data and the linear regression line.***
+
+We will again use the library ggplot2 to add the regression line
+```{r warning= FALSE}
+
+# assigning the dataset
+data(AdExp)
+
+# deciding on X and Y axis + plotting the points on graph in blue
+p1 = ggplot( data= AdExp,aes( x= advtexp,y= sales)) + geom_point( color= 'blue')
+
+# plotting the regression line through the points
+p1 + geom_smooth( method= 'lm', se= F, col= "red")
+
+
+```
+
+***Part 6: Plot the standardized residuals vs. fitted values.***
+
+```{r}
+
+# obtaining standard residuals
+linearRegModel.StdRes <- rstandard(linearRegModel)
+
+# obtaining fitted values
+linearRegModel.Fit <- fitted.values(linearRegModel)
+
+# deciding on X and Y axis + plotting the points on graph in blue
+p3=ggplot(data=AdExp,aes(x=linearRegModel.Fit,y=linearRegModel.StdRes))+geom_point(color='blue')
+
+# plotting the best fitting line through the points in red 
+p3 + geom_smooth( method= 'lm', se= F, col= "red")
+
+```
