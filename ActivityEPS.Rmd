@@ -1,0 +1,120 @@
+---
+title: "Activity on Simple Regression"
+output: pdf_document
+---
+## R Markdown
+
+**Task:** The purpose of this analysis is to use simple regression to accurately forecast Monthly Returns based on the Earnings Per Share provide for the year 2005 in our EPS dataset
+
+The Steps we will take are:
+
+1) Load the dataset in RStudio and have a look at the data.
+
+2) Look at the scatterplot for EPS vs Returns.
+
+3) Check the correlation between variables.
+
+4) Build the linear regression model.
+
+5) Plot the original data and the regression line.
+
+6) Plot the standardized residuals vs. fitted values.
+
+**Part 1: Load the libraries and dataset in RStudio.**
+
+```{r message= FALSE}
+#loading the libraries we will use for this exercise
+library(readr)
+
+#loading the dataset in RStudio
+EPS<-read_csv(file= "/Users/devarshipancholi/Downloads/ReturnsVsEPS05ForHandout8.csv")
+```
+
+Now lets have a look at our dataset
+
+```{r}
+
+#printing the data to the pdf file
+print(EPS)
+```
+
+**Part 2: Look at the scatterplot for Sales vs Expenditure.**
+#the values are in 000's
+
+To plot the regression line and scatterplot, I have used the library ggplot which we loaded in the beginning:
+
+```{r}
+library(ggplot2)
+
+# command for loading the plot and assigning the axis + plotting the points on graph in blue
+
+ggplot(data=EPS,aes(x=EPS$'EPS Q4 2005',y=EPS$'Monthly Return after Q4 2005'))+geom_point(color='blue')
+
+```
+The scatterplot indicates there is little or no presence of a linear relationship. Lets verify this:
+
+**Part 3: Checking the co-relation **
+
+```{r}
+
+# 'all.obs' is used here as there are no missing data.
+# 'pearson' method is used as our data is linear and normally distributed
+
+cor(EPS$'EPS Q4 2005',EPS$'Monthly Return after Q4 2005')
+
+```
+
+**Part 4:Build the linear regression model.**
+
+The lm() function is used here to build linear regression models for comparison (EPS vs. Returns). summary() is used for the model to get the R-Squared values.
+
+```{r}
+
+# simple regression model stored in the variable mamed "linearRegModel"
+
+linearRegModel<- lm(EPS$'Monthly Return after Q4 2005' ~ EPS$'EPS Q4 2005', data= EPS)
+print(linearRegModel)
+
+```
+Next, we get the summary for our regression model. This function allows us to observe a number of values like R-Squared, t-values and p-values for our varialbe "EPS Q4".
+
+```{r}
+
+#getting the summary
+summary(linearRegModel)
+
+```
+
+***Part 5: Plot the original data and the linear regression line.***
+
+We will again use the library ggplot2 to add the regression line
+```{r warning= FALSE}
+# assigning the dataset
+data(EPS)
+
+# deciding on X and Y axis + plotting the points on graph in blue
+p1 = ggplot (data= EPS, aes(x=EPS$'EPS Q4 2005',y=EPS$'Monthly Return after Q4 2005')) + geom_point(color='blue')
+
+# plotting the regression line through the points
+p1 + geom_smooth( method= 'lm', se= F, col= "red")
+
+
+```
+
+***Part 6: Plot the standardized residuals vs. fitted values.***
+
+```{r}
+
+# obtaining standard residuals
+linearRegModel.StdRes <- rstandard(linearRegModel)
+
+# obtaining fitted values
+linearRegModel.Fit <- fitted.values(linearRegModel)
+
+# deciding on X and Y axis + plotting the points on graph in blue
+p3=ggplot(data=EPS,aes(x=linearRegModel.Fit,y=linearRegModel.StdRes))+geom_point(color='blue')
+
+# plotting the best fitting line through the points in red 
+p3 + geom_smooth( method= 'lm', se= F, col= "red")
+
+```
