@@ -1,0 +1,185 @@
+---
+title: "BA Homework 2"
+author: "Devarshi Pancholi"
+date: "9/13/2019"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
+---
+
+***PROBLEM 1: Citibike Analysis***\newline
+
+***Analytics Questions:***
+
+**1. Compute summary statistics for tripduration**
+```{r}
+library(readr)
+Citi <- read_csv(file= "/Users/devarshipancholi/Downloads/JC-201709-citibike-tripdata.csv")
+summary(Citi$tripduration)
+mean(Citi$tripduration)
+var(Citi$tripduration)
+range(Citi$tripduration)
+```
+
+
+**2. Compute summary statistics for age**
+```{r}
+Current <- 2019
+Citi$'Age' <- Current - as.numeric(Citi$'birth year')
+CitiC <- na.omit(Citi)
+head(CitiC,10)
+summary(CitiC$'Age')
+mean(CitiC$'Age')
+var(CitiC$'Age')
+range(CitiC$'Age')
+```
+
+
+**3. Compute summary statistics for tripduration in minutes**
+```{r}
+Minutes <- 60
+Citi$'tripMin' <- as.numeric(Citi$'tripduration')/Minutes
+summary(Citi$tripMin)
+sd(Citi$tripMin)
+```
+
+
+**4. Compute the correlation between age and tripduration**
+```{r}
+cor(CitiC$Age, CitiC$tripduration)
+```
+\newline
+\newline
+
+***Business Questions:*** 
+
+**1. What is the total revenue assuming all users riding bikes from 0 to 45 minutes pay $3 per ride and user exceeding 45 minutes pay an additional $2 per ride.**
+
+```{r}
+x=0
+y=0
+for(a in 1:nrow(Citi)){
+  Citi$Cost[a]= 0
+  if(Citi$tripMin[a]<46){
+    Citi$Cost[a]= 3
+  }
+  else{
+    Citi$Cost[a]= 5
+  }
+}
+sum(Citi$Cost)
+```
+Hence the total revenue of all the users present in the dataset is $100,601.
+
+**2. Looking at tripduration in minutes, what can you say about the variance in the data.**
+```{r}
+var(Citi$tripMin)
+```
+
+The variance here is  44,300 minutes approximately. This means that the data is spread out. This is because we have a very huge maximum in the datase of about 36,360 minutes. 
+
+**3. What does this mean for the pricing strategy?**
+
+From question 3 above we have seen that 3rd quartile in the dataset is 10.17 minutes. This means 75% of the data is we have about our tripduration in minutes is falls within those 10 minutes. Our mean for tripduration in minutes is 12.62 minutes. This means that majority of the customers hire the bikes for about 15 minutes. According to the current pricing strategy, we charge $3 for first 45 minutes. But in this case, it would make more sense if we reduce those minutes for the flat rate. 
+
+So according to my understanding charging a flat rate of USD 3 for 25 minutes will be more appropriate as most users who go above that time period will have to pay an additional of USD 2. This will help out in increasing revenue for the company without much difference for most of the exisisting users. This will be benifical for customer retention. Here is the total revenue calculation according to our new strategy:
+
+```{r}
+x=0
+y=0
+for(a in 1:nrow(Citi)){
+  Citi$Cost[a]= 0
+  if(Citi$tripMin[a]<26){
+    Citi$Cost[a]= 3
+  }
+  else{
+    Citi$Cost[a]= 5
+  }
+}
+sum(Citi$Cost)
+```
+
+As visible above, we have already increased the revenue by $3,195(approximately). This can be tweaked a little to maximise profits 
+
+**4. What does this mean for inventory availability?**
+
+As majority of our customers spend about 15 minutes on a ride and with the new pricing strategy which limits the user for about 25 minutes for the initial charge of $3, it would be pretty safe to say that Citi wont need as much inventory as before. Most of the bikes would be rotating between different stations within those 25 minutes. Citi can cut some of the inventory costs too in order to increase their revenues.
+
+\newline
+\newline
+\newline
+
+***PROBLEM 2: Zagat Descriptive Analytics***
+
+***Analytics Questions:***
+
+**1. What can you say about the central tendency of the ratings?**\newline
+**2. What can you say about the spread and dispersion of the ratings?**
+```{r}
+library(readr)
+Zag <- read_csv(file= "/Users/devarshipancholi/Downloads/zagat.csv")
+head(Zag,10)
+```
+```{r}
+library(psych)
+ZagC <- Zag[-1]
+describe(ZagC)
+```
+```{r}
+harmonic.mean(Zag$Food)
+harmonic.mean(Zag$Decor)
+harmonic.mean(Zag$Service)
+harmonic.mean(Zag$Price)
+```
+
+From Central tendencies of the  rating, it is safe to say that the data is evenly distributed. Price has the maximum range of 72 as well as mean of 36.55. All other rating dimensions are comparatively low. So i decided to go for harmonic mean as it gives equal weights to all data points and the difference wasn't noteworthy.
+
+As for the spread and the dispersion, Price has the higest spread of 72.
+
+**3. What are the correlations between rating dimensions?**
+```{r}
+ZagC <- Zag[-1]
+cor(ZagC)
+```
+
+
+**4. Using the information in 1-3, design a weighted average (index) that computes scores for each restaurant. Your index needs to reflect which ratings (decor vs food vs service vs price) you wish to amplify with loads/weights**
+
+```{r}
+for(a in 1:nrow(Zag)){
+  Zag$WFood[a] <- (Zag$Food[a]*2)/300
+  Zag$WDecor[a] <- (Zag$Decor[a]*2)/300
+  Zag$WService[a] <- (Zag$Service[a]*3)/300
+  Zag$WPrice[a] <- (Zag$Price[a]*3)/300
+}
+head(Zag,10)
+for(a in 1:nrow(Zag)){
+  Zag$Score[a] <- (Zag$WFood[a] + Zag$WDecor[a] + Zag$WService + Zag$WPrice)
+}
+head(Zag,10)
+```
+Seeing the correlations between the rating dimensions, I have dedided to give weights as following:
+Food: 2
+Decor: 2
+Service: 3
+Price: 3
+
+Taking the mean with those weights and summing up  all four rating dimensions, I have came up with a score system in a range of 0 to 1. This means the first restaurant in our dataset has a rating of 0.613/1.000.
+
+
+***Business Questions:*** 
+
+
+**1. What makes a business more profitable?**
+
+Profit = Revenue - Expenses. So the more the revenue generation the better for the business. On the other hand, expenses should be as minimum as possible to increase the profit margin. In our case, the restaurant owners have to be aware of what rating dimension is most important for their restaurant. If they focus on maintaining/developing those dimensions, revenues shall be increased.
+
+**2. If you were hired to advise a new restaurant operator, what would you recommend in terms of the balance & trade-offs between food, decor, service, and price?**
+
+First of all, I need to find out which rating dimensions are critical for the restaurant based on the setting and the location of the place. Suppose a restaurant is a simple food cart along the sidewalk, "Decor" and "Service" is not at all important for such restaurant. As a result of this, "Food" and "Price" becomes increasingly important to the food cart. Good quick food at relatively cheap price is the goal for such restaurants.
+
+On the other hand, if i am hired by a michelin star restaurant, I need to leave the "Food" dimension upto the chef there. As the food will be priced high, a lot of focus needs to be put on the "Service" as we have seen almost 85% correlation between "Price" and "Service" in our analysis. "Decor" needs to be on point too.
+
+Generalizing all of these, as per my correlation analysis, "Price" and "Service" goes hand in hand. There is no direct dependency between "Food" and "Decor". This means you can sell good food from a food truck as long as it is cheap and do not have to worry about "Service" and "Decor".

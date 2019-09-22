@@ -1,0 +1,245 @@
+---
+title: "BA Homework 1"
+author: "Devarshi Pancholi"
+date: "9/9/2019"
+output: pdf_document
+---
+***PROBLEM 1***
+\newline
+\newline
+**You are given the closing stock prices of 4 companies for one year. With the help of the what you are being taught in the first class (basic arithmetic in R) answer the following questions.**
+\newline
+*Q1. Compute the average price of each company’s share for the given year.*\newline
+R CODE:
+```{r}
+library(readr)
+Stocks<-read_csv(file= "/Users/devarshipancholi/Desktop/Stock prices HMK1.csv")
+```
+```{r}
+mean(Stocks$AMZN)
+mean(Stocks$KMX)
+mean(Stocks$GOOG)
+mean(Stocks$GE)
+```
+
+*Q2. What are the data types of all the variables in the dataset?*\newline
+R CODE:
+```{r}
+class(Stocks$Date)
+class(Stocks$AMZN)
+class(Stocks$KMX)
+class(Stocks$GOOG)
+class(Stocks$GE)
+```
+
+*Q3. Calculate the returns for each company’s share for the given year on daily basis.*\newline
+R CODE:
+```{r}
+Stocks$RAMZN <- 0
+Stocks$RKMX <- 0
+Stocks$RGOOG <- 0
+Stocks$RGE <- 0
+for(a in 2:nrow(Stocks)){
+  Stocks$RAMZN[a]<-(Stocks$AMZN[a]-Stocks$AMZN[a-1])/Stocks$AMZN[a-1]
+  Stocks$RKMX[a]<-(Stocks$KMX[a]-Stocks$KMX[a-1])/Stocks$KMX[a-1]
+  Stocks$RGOOG[a]<-(Stocks$GOOG[a]-Stocks$GOOG[a-1])/Stocks$GOOG[a-1]
+  Stocks$RGE[a]<-(Stocks$GE[a]-Stocks$GE[a-1])/Stocks$GE[a-1]
+}
+head(Stocks,10)
+```
+
+*Q4. Calculate the cumulative returns for each company’s share for the given year.*\newline
+R CODE:
+```{r}
+as.numeric(as.character(Stocks$RAMZN[1])) - as.numeric(as.character(Stocks$RAMZN[237]))
+as.numeric(as.character(Stocks$RKMX[1])) - as.numeric(as.character(Stocks$RKMX[237]))
+as.numeric(as.character(Stocks$RGOOG[1])) - as.numeric(as.character(Stocks$RGOOG[237]))
+as.numeric(as.character(Stocks$RGE[1])) - as.numeric(as.character(Stocks$RGE[237]))
+```
+
+*Q5. Find out the top 5 top returns for the given year.*\newline
+R CODE:
+```{r}
+Stocks$AMZN[order(Stocks$AMZN, decreasing = TRUE)[1:5]]
+Stocks$KMX[order(Stocks$KMX, decreasing = TRUE)[1:5]]
+Stocks$GOOG[order(Stocks$GOOG, decreasing = TRUE)[1:5]]
+Stocks$GE[order(Stocks$GE, decreasing = TRUE)[1:5]]
+```
+
+*Q6. Find out the top 5 worst returns for the given year.*\newline
+R CODE:
+```{r}
+Stocks$AMZN[order(Stocks$AMZN, decreasing = FALSE)[1:5]]
+Stocks$KMX[order(Stocks$KMX, decreasing = FALSE)[1:5]]
+Stocks$GOOG[order(Stocks$GOOG, decreasing = FALSE)[1:5]]
+Stocks$GE[order(Stocks$GE, decreasing = FALSE)[1:5]]
+```
+
+*Q7. Using the function plot(), try to visualize the returns of the stock over one year*\newline
+R CODE:
+```{r}
+library(ggplot2)
+ggplot(data= Stocks, aes( x= Date, y= RAMZN)) + geom_point( color= 'blue') + geom_smooth( method= 'auto', se= F, col= "red")
+ggplot(data= Stocks, aes( x= Date, y= RKMX)) + geom_point( color= 'blue') + geom_smooth( method= 'auto', se= F, col= "red")
+ggplot(data= Stocks, aes( x= Date, y= RGOOG)) + geom_point( color= 'blue') + geom_smooth( method= 'auto', se= F, col= "red")
+ggplot(data= Stocks, aes( x= Date, y= RGE)) + geom_point( color= 'blue') + geom_smooth( method= 'auto', se= F, col= "red")
+```
+\newline
+\newline
+\newline
+\newline
+\newline
+***PROBLEM 2***
+**Using the Cheesemakers dataset, answer the following questions:**
+
+*Q1. Compute the summary statistics for gross profit in cheese? What does this mean to you?*\newline
+R CODE:
+```{r}
+library(readr)
+Cheesemaker<-read_csv(file= "/Users/devarshipancholi/Downloads/Cheesemakers_v2.csv")
+summary(Cheesemaker$`Gross profit`)
+```
+DESCRIPTION: As we can see the average profit from all customers  is 22.49 with maximum individual of 4470 and minimum of  2.
+
+*Q2. Plot a histogram and a box plot of gross profits. Explain them in English? What do you see? What is normal/abnormal?*
+\newline
+R CODE for histogram:
+```{r}
+hist(Cheesemaker$'Gross profit',
+     main="Histogram for Cheesemaker", 
+     xlab="Gross Profit", 
+     border="blue", 
+     col="grey",
+     ylim = c(0,1000))
+```
+DESCRIPTION: In the histogram, I have limited the y-value to 1000 so as to get more clear idea about the frequencies of different groups. it can be clearly seen that the gross profits of 0-100 is the most common/repeated in the dataset. Then comes the gross profit group of 100-200 which is drastically low occuring around just 500 times as compared to approximately 100,000 times for 0-100 group in gross profit.
+\newline
+\newline
+\newline
+R CODE for  boxplot:
+```{r}
+boxplot(Cheesemaker$'Gross profit',
+        main = "Descriptive Stats for Gross Profit within the dataset",
+        xlab= "Gross Profit",
+        col = "orange",
+        border = "brown",
+        ylim= c(0,100),
+        horizontal = TRUE,
+        notch = TRUE)
+```
+DESCRIPTION: As there are a lot of outliers, I have limited the Y-axis to 100 as most observation falls in that range which is evident from the histogram we plotted above. Here we can see the minimum is at 2, 1st quartile falls at 7, median falls at 10 and 3rd quartile is at 18. This can be verified from the summary statistics in the above question. However the maximum which is at 4470 is intentionally removed from the plot so as to make the other things clear.
+\newline
+*Q3. Using the CustomerID column, identify the number of customer who have done recurring purchases.*
+\newline
+R CODE:
+```{r include= FALSE}
+library(plyr)
+Reccuring <- data.frame(table(Cheesemaker$'Customer ID'))
+Reccuring[Reccuring$Frequency > 1]
+count(Reccuring)
+```
+DESCRIPTION: There are 47,363 repeat entries in Customer ID which means 47,363 customers are repeat customers. I have not included the output here as it prints 47,636 rows and i can't wrap count function inside the head function.
+\newline
+*a. What is the average number of purchases of the recurring clients?*\newline
+R CODE:
+```{r}
+mean(Reccuring$Freq)
+```
+*b. What is the average spent by recurring clients?*\newline
+R CODE:
+```{r}
+mean(subset(Cheesemaker$'Sale amount', Reccuring$Freq > 1 ))
+```
+*c. What is the variance in gross profits between recurring clients vs clients who buy 1 cheese?*\newline
+R CODE:
+```{r}
+var(subset(Cheesemaker$'Gross profit', Reccuring$Freq > 1 ))
+var(subset(Cheesemaker$'Gross profit',!Reccuring$Freq > 1 ))
+```
+*Q4. Which are the most profitable clients?*\newline
+R CODE:
+```{r}
+head(sort(Cheesemaker$'Gross profit', decreasing=TRUE), 5)
+```
+*5. How many clients are paying more than 2 standard deviations of the mean price? What does that mean in english?*\newline
+R CODE:
+```{r}
+sd(Cheesemaker$'Sale amount')*2
+length(subset(Cheesemaker$'Customer ID', Cheesemaker$'Sale amount' > 500.1844))
+```
+DESCRIPTION: As we can see here, 1221 cuctomers are paying above 2 standard deviation of the mean price. This mneans these customers are highly profitable customers.
+\newline
+
+*6. Compute number of unique clients per state*
+R Code:
+```{r}
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="AL")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="AK")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="AZ")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="AR")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="CA")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="CO")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="CT")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="DE")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="FL")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="GA")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="HI")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="ID")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="IL")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="IN")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="IA")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="KS")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="KY")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="LA")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="ME")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="MD")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="MA")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="MI")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="MN")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="MS")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="MO")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="MT")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="NE")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="NV")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="NH")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="NJ")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="NM")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="NY")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="NC")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="ND")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="OH")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="OK")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="OR")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="PA")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="RI")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="SC")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="SD")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="TN")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="TX")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="UT")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="VT")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="VA")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="WA")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="WV")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="WI")))
+length(unique(subset(Cheesemaker$'Customer ID',Cheesemaker$'State'=="WY")))
+```
+
+*a. Normalize the data using min-max scaling*\newline
+R CODE:
+```{r eval= FALSE}
+library(normalr)
+head(normalize(Cheesemaker$'Gross profit'),10)
+head(normalize(Cheesemaker$'Sale amount'),10)
+head(normalize(Cheesemaker$'Sale amount'),10)
+head(normalize(Cheesemaker$'Sales target'),10)
+```
+*b. Is there an association (correlation) between client volume and sales?*\newline
+R CODE:
+```{r}
+library(dplyr)
+all<- Cheesemaker %>% select_if(is.numeric)
+cor(all, use="all.obs", method="pearson")
+cor(Cheesemaker$'Sales target',Cheesemaker$'Sale amount')
+```
+DESCRIPTION: Looking at the output there seems to be minimal co-relation, but the states which has high customers has high sales indicating association between the two variables.
