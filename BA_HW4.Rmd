@@ -1,0 +1,325 @@
+---
+title: "BA HW 4"
+author: "Devarshi Pancholi"
+date: "10/15/2019"
+output: pdf_document
+---
+
+***Problem 1: Bicycling World Problem.***
+
+
+```{r}
+bicycle <- data.frame("Model" = c("Fierro 7B", "HX 5000", "Durbin Ultralight", "Schmidt", "WSilton Advanced", "bicyclette velo", "Supremo Team", "XTC Racer", "D'OnfrioPro", "Americana #6"), "Weight"= as.numeric(c("17.9", "16.2", "15.0", "16.0", "17.3", "13.2", "16.3", "17.2", "17.7", "14.2")), "Price"= as.numeric(c("2200", "6350", "8470","6300", "4100", "8700", "6100", "2680", "3500", "8100")))
+#View(bicycle)
+```
+
+**Problem 1: Solution a**
+
+```{r}
+library(ggplot2)
+ggplot(data=bicycle, aes(x= Weight, y= Price))+ 
+  geom_point(color='blue')+
+  labs(x="Weight of bicycle",y="Price")
+```
+
+Based on the above graph above it is clear that there exists a negative but linear relationship between weight and the price. And rightly so, its logical that the price of the bicycle increases as its weight decrease.
+
+
+**Problem 1: Solution b**
+
+```{r}
+
+bicycleModel<- lm( Price ~ Weight, data= bicycle)
+summary(bicycleModel)
+
+```
+
+**Problem 1: Solution c**
+
+The model is constructed above. From the summary of the regression model, we can see that the intercept and variable "Weight" both are 0.001 at 0.05 significance level. This means that Weight is statistically significant variable. The correct interpretation of this variable is, if the Weight of bicycle is decreased by 1439 units, the Price of the bicycle will increase by 1 unit.
+
+**Problem 1: Solution d**
+
+As R-squared is 86.37%, it is safe to say that 86% variability in price is explained by the regression model built here.
+
+***Problem 2: Assembly Line Problem***
+
+```{r}
+
+line <- data.frame("line.Speed" = as.numeric(c("20", "20", "40", "30", "60", "40")), "defects"= as.numeric(c("21", "19", "15","16", "14", "17")))
+#View(line)
+```
+
+**Problem 2: Solution a**
+
+```{r}
+
+ggplot(data=line, aes(x= line.Speed, y= defects))+
+  geom_point(color='blue')+
+  labs(x="Line Speed",y="Number of defective parts")
+
+```
+
+The scatter plot indicates that there is a loose negative relationship between line speed and defects. As seen above, as line speed increases, number of defective parts generally tend to go down but it one case it can be seen as increasing. So  nothing specific can be said with just the scatterplot except that the sample size need to be increased for more concrete results.
+
+**Problem 2: Solution b**
+
+```{r}
+
+lineModel<- lm( defects ~ line.Speed, data= line)
+summary(lineModel)
+
+```
+
+**Problem 2: Solution c**
+
+If the significance level is 0.01, then only the intercept can be considered as statistically significant. But talking about the variable 'line.Speed', its p value < 0.05 but not 0.01. Hence, it cannot be considered statistically significant for our model. As the sample size is really less, these interpretations can be considered meaningful where 'line.Speed' is not significant.
+
+**Problem 2: Solution d**
+
+As R-squared is 73.91%, it is safe to say that about 74% variability in defective parts is explained by the regression model built here.
+
+***Problem 3: Jensen Tire & Auto Problem***
+
+```{r}
+
+auto <- data.frame("Usage" = as.numeric(c("13", "10", "20", "28", "32", "17", "24", "31", "40", "38")), "Main.Exp"= as.numeric(c("17", "22", "30","37", "47", "30.5", "32.5", "39", "51.5", "40")))
+#View(auto)
+
+```
+
+**Problem 3: Solution a**
+
+```{r}
+
+ggplot(data=auto, aes(x= Usage, y= Main.Exp))+ 
+  geom_point(color='blue')+
+  labs(x="Weekly Usage Hours",y="Annual Maintainence Expence ($'00)")
+
+```
+
+There exists a positive linear relationship between weekly usage hours and annual maintainence expenses. The more the machine is used the more will be its maintainence costs.
+
+**Problem 3: Solution b**
+
+```{r}
+
+autoModel<- lm( Main.Exp ~ Usage, data= auto)
+summary(autoModel)
+
+```
+
+***Problem 4: Toyota Problem***
+
+```{r}
+
+Toyota <- data.frame("Miles" = as.numeric(c("22", "29", "36", "47", "63", "77", "73", "87", "92", "101","110", "28","59","68","68","91","42","65", "110")), "Price"= as.numeric(c("16.2", "16.0", "13.8","11.5", "12.5", "12.9", "11.2", "13", "11.8", "10.8","8.3","12.5","11.1","15.0","12.2","13.0","15.6","12.7","8.3")))
+View(Toyota)
+
+```
+
+**Problem 4: Solution a**
+
+```{r}
+
+ggplot(data=Toyota, aes(x= Miles, y= Price))+ geom_point(color='blue')+labs(x="Miles drive in 1000s",y="Price in $1,000s")
+
+```
+
+The scatter plot indicates that there is a loose negative relationship between miles driven and price of a Toyota Camry. As seen above, as miles driven increases, price generally tend to go down which is logical. But nothing specific can be said with just the scatterplot except that the sample size need to be increased for more concrete results.
+
+**Problem 4: Solution b**
+
+```{r}
+
+ToyotaModel<- lm( Price ~ Miles, data= Toyota)
+summary(ToyotaModel)
+
+```
+
+**Problem 4: Solution c**
+
+Significance level being 0.01, both the slope intercept (B0) and variable, 'Miles' (B1) is statistically significant as they are less than 0.001. This means that for every 0.05877 unit miles driven for a Toyota Camry, its price decreases by 1 unit. These interpretations are reasonable as the more a vehicle is driven, the less its market value.
+
+**Problem 4: Solution d**
+
+As R-squared is 53.87%, it is safe to say that about 54% variability in prices of Toyota Camry is explained by the regression model built here.
+
+**Problem 4: Solution e**
+
+```{r}
+
+for(a in 1:nrow(Toyota)){
+  Toyota$Pridicted_Price[a] <- (16.47 - 0.05877 * Toyota$Miles[a])
+  Toyota$Residual[a] <- (Toyota$Price[a] - Toyota$Pridicted_Price[a])}
+head(Toyota, 12)
+
+```
+
+Automobiles with the highest bargains means the ones which will have actual Price lower than the Pridicted_Price, i.e., highest negative residuals.  This means the automobile with 47,000 miles (line 4 above) and another one with 28,000 miles (line 12 above) are the highest bargains. 
+
+**Problem 4: Solution f**
+
+```{r}
+
+My_Price <- (16.47 - 0.05877 * 60)
+print(My_Price)
+
+```
+
+As the price is in '000s, the price I will pay turns out to be \$12,944. I would try to drive it down to an even \$12,000 based on the data above.
+
+
+***Problem 5: Dodger Stadium Attendance***
+
+```{r}
+
+library(readr)
+ball <- read.csv("/Users/devarshipancholi/Desktop/dodgers.csv")
+head(ball, 10)
+
+```
+
+**5.1.a. How many times did promotions take place during the year (cap vs shirts vs bobblehead vs fireworks)?**
+
+```{r}
+
+aggregate(ball$cap, by = ball['cap'], length)
+aggregate(ball$shirt, by = ball['shirt'], length)
+aggregate(ball$bobblehead, by = ball['bobblehead'], length)
+aggregate(ball$fireworks, by = ball['fireworks'], length)
+
+```
+
+As seen above: Cap occured 2 times, Shirt occured 3 times. Bobblehead occured 11 times, and fireworks were the most frequent promotion with 14 timesd.
+
+**5.1.b. How does attendance vary with and without promotions**
+
+```{r}
+
+ball$promo <- ifelse(ball$cap == "YES" | ball$shirt == "YES" | ball$bobblehead == "YES" | ball$fireworks == "YES", "Yes", "No")
+
+ggplot(ball ,aes(x = promo , y = attend)) +
+  geom_point() + geom_smooth (method = "lm") + 
+  labs(x = "Promotions",y = "Attendance", title = paste("Promo/No Promo VS Attendance") )
+
+```
+
+As we can see above, the games that have promotions tends to draw more audience.
+
+**5.1.c. What patterns exist with programming of games (weather, time, month, day)**
+
+```{r}
+
+library(dplyr)
+ball.weather <- group_by(ball, skies) 
+ball.days <- group_by(ball, day_of_week)
+ball.months <- group_by(ball, month)
+ball.time <- group_by(ball, day_night)
+
+weather.sum <- summarise(ball.weather, Freq1= n())
+days.sum <- summarise(ball.days, Freq2= n())
+months.sum <- summarise(ball.months, Freq3= n())
+time.sum <- summarise(ball.time, Freq4= n())
+
+ggplot(weather.sum, aes(x = skies , y = Freq1)) +
+  geom_bar(stat = "identity", width = 0.2, fill= 'coral') +
+  labs(x = "Weather",y = "Games Programmed", title = paste("Games VS Weather"))
+
+ggplot(days.sum, aes(x = day_of_week , y = Freq2)) +
+  geom_bar(stat = "identity", width = 0.2, fill = "coral") +
+  labs(x = "Days",y = "Games Programmed", title = paste("Games VS Days"))
+
+ggplot(months.sum, aes(x = month , y = Freq3)) +
+  geom_bar(stat = "identity", width = 0.2, fill = "coral") +
+  labs(x = "Months",y = "Games Programmed", title = paste("Games VS Months"))
+
+ggplot(time.sum, aes(x = day_night , y = Freq4)) +
+  geom_bar(stat = "identity", width = 0.2, fill = "coral") +
+  labs(x = "Time",y = "Games Programmed", title = paste("Games VS Time"))
+
+```
+
+**5.1.d. Which opposing teams bring in attendance above average?.**
+
+```{r}
+
+mean(ball$attend)
+unique(subset(ball,attend > "41040", select= c("opponent")))
+
+
+
+```
+
+The average attendance number is 41,040. These 16 teams above brings in audience above average.
+
+**5.2.a. Will the bobblehead promotions increase attendance?**\newline
+**5.2.b. Are bobblehead promotions better than all other promotions?**
+
+```{r}
+
+ballModel <- lm(as.numeric(attend) ~ as.numeric(month) + as.numeric(day)+as.numeric(day_of_week)+as.numeric(opponent)+as.numeric(temp)+as.numeric(skies)+as.numeric(day_night)+as.numeric(cap)+as.numeric(shirt)+as.numeric(fireworks)+as.numeric(bobblehead), data= ball)
+summary(ballModel)
+```
+
+I have built a model which predicts attendance based on several indipendent factors. According to the multiple regression model run above, it seems that the only statistically significant variable among all those variables are the promotions: 'Shirt', 'Fireworks' and 'Bobblehead'. Bobblehead is most significant variable at p-value less than 0.001. Next are fireworks with p-value less than 0.05. In some cases 'shirt' can be considered significant with p-value less than 0.1, but as the sample size is really small here we won't consider it.
+
+So it is safe to say that bobblehead promotions increase the attendance. Also, bobblehead promotions are most important promotion followed by fireworks.
+
+**5.2.c. Giving your predictions, how many bobblehead should we ordered for the summer time (Jun - Aug)**
+
+Calculating the average number of people throught out the summer
+
+```{r}
+
+June <- sum(subset(ball,month == "JUN", select= c("attend")))
+July <- sum(subset(ball,month == "JUL", select= c("attend")))
+Aug <- sum(subset(ball,month == "AUG", select= c("attend")))
+Summer <- (June + July + Aug)/3
+print(Summer)
+
+```
+
+533,116 are the average number of people to attend a game during the summer months.
+
+Using this number we may pridict how many time bobble head promotion will take place during summer months:
+
+```{r}
+
+SummerP <- lm(as.numeric(bobblehead) ~ as.numeric(attend) + as.numeric(fireworks) + as.numeric(shirt), data = ball)
+summary(SummerP)
+```
+
+```{r}
+
+0.6452 + 0.00002517 * 533116 - 0.1796 * 11 - 0.3197 * 3
+
+```
+
+Bobblehead promotions will take place 11 times. Now using this we may predict average number of people in one game where bobblehead promotions are done during summer months:
+
+```{r}
+
+AudienceModel <- lm(as.numeric(attend) ~ as.numeric(bobblehead) + as.numeric(fireworks) + as.numeric(shirt), data = ball)
+summary(AudienceModel)
+
+```
+```{r}
+
+Predicted_Audience <- 11936 + 14944 * 11 + 8443 * 3
+print(Predicted_Audience)
+
+```
+
+201,649 is the average number of people in one game where bobblehead promotions are done during summer months.
+
+```{r}
+
+Num_bobbleheads <- 201649 * 8
+print(Num_bobbleheads)
+
+```
+
+Multiplying the average number of bobblehead promotions during summer months(8 times) to average number of people attending a game during summer where bobblehead predictions are done gives us total prediction for number of bobbleheads needed.
+
+This number is 1,613,192. This is the minimum number of bobbleheads needed for all the promotions throughout the summer months.

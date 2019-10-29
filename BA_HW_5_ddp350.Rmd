@@ -1,0 +1,295 @@
+---
+title: "BA HW 5"
+author: "Devarshi Pancholi"
+date: "10/28/2019"
+output: pdf_document
+---
+
+***Problem 1: Progresso Soup Sales***
+
+```{r}
+
+library(readr)
+soup <- read.csv("/Users/devarshipancholi/Desktop/Progresso_Soup.csv")
+head(soup,10)
+
+```
+
+**1. Create a dummy variable for “Winter” months defined as Oct, Nov, Dec, Jan & Feb and answer the following:**\newline
+*a. What patterns are you seeing in the data?*
+
+```{r}
+
+#head(soup,10)
+
+soup$Winter <- as.logical(0)
+for (i in 1:nrow(soup)){
+  if (soup$Month[i] == "10")
+    soup$Winter[i] <- as.logical(1)
+  else if (soup$Month[i] == "11")
+    soup$Winter[i] <- as.logical(1)
+  else if (soup$Month[i] == "12")
+    soup$Winter[i] <- as.logical(1)
+  else if (soup$Month[i] == "1")
+    soup$Winter[i] <- as.logical(1)
+  else if (soup$Month[i] == "2")
+    soup$Winter[i] <- as.logical(1)
+}
+head(soup, 10)
+```
+```{r}
+
+library(ggplot2)
+ggplot(soup)+
+  geom_bar(mapping = aes(x = soup$Month, y = soup$Sales.Progresso), stat = "identity") +
+  labs(x= "Months", y = "Sales")
+
+ggplot(soup)+ 
+  geom_bar(mapping = aes(x = soup$Region, y = soup$Sales.Progresso), stat = "identity", width = 0.3) + 
+  labs(x= "Region", y = "Sales")
+
+ggplot(data=soup,aes(x=soup$Price.Progresso,y=soup$Sales.Progresso))+
+  geom_point(color='blue')+
+  labs(x="Price of Progresso",y="Sales")
+
+
+```
+As we can see from the first graph of sales vs. months, it is clear that sales during winter is higher than summer months. Also sales in the eastern region is much higher than other regions. From the scatterplot, it is clear that the higher the price of the soup the lesser its sales. The data is right skewed.
+
+*b. What patterns are you seeing in sales during the Winter months?*
+
+```{r}
+
+winter <- subset(soup, Month == "10" | Month == "11" | Month == "12" | Month == "1" | Month == "2")
+
+ggplot(winter)+
+  geom_bar(mapping = aes(x = winter$Month, y = winter$Sales.Progresso), stat = "identity") +
+  labs(x= "Months", y = "Sales")
+
+ggplot(winter)+ 
+  geom_bar(mapping = aes(x = winter$Region, y = winter$Sales.Progresso), stat = "identity", width = 0.3) + 
+  labs(x= "Region", y = "Sales")
+
+```
+As we can see from the graphs above, there is not much difference in the way sales behave between regions in the winter months compared to year as a whole. This may happen because winter months have higher sales compared to the rest of the year and so winter months influence the sales of the soup all year round. Clearly, sales are higher during winter.
+
+*c. Compute the “Market Share” for Progresso (as percentage of total sales) in the Winter vs. non-Winter months*
+
+```{r}
+
+p <- sum(winter$Sales.Progresso)
+q <- sum(winter$Category_Sales)
+r <- sum(soup$Sales.Progresso)
+s <- sum(soup$Category_Sales)
+p/q -> market_share_winter
+r/s -> market_share_nonwinter
+market_share_winter
+market_share_nonwinter
+
+```
+During winter months, Progresso soup has 28% market share while during non-winter months the market share is 24%.
+
+**2. Develop a linear regression model to predict Progresso sales. Explain the results of the regression model (model strength, variable importance, relationship between the predictors and the dependent variable).**
+
+```{r}
+
+soupModel <- lm(Sales.Progresso ~  Month + Region+ Winter + Price.Campbell + Price.PL + Price.Progresso + Low_Income + High_Income, data = soup)
+summary(soupModel)
+
+```
+
+All the variables are statistically significant but most of them have a negative impact on the sales. Among the ones that are positive, 'Price.Campbell' and 'Winter' are the most important ones as they have highest positive coefficients. This means all things constant, a unit rise in 'Winter' is equivalent to 822 times increase in sales.
+
+As far as R-square go, the model isn't the strongest one with almost 40% R-square value. This means only 40% of the varability in data is explained by the model.
+
+**3. Understand your model and give actionable recommendations to the marketing department of Progresso.**
+
+The model has higests coefficients for variables like 'Price.Campbell', 'Winter' and 'High_Income' among others. This means that the marketing campain should first target families with high income as the taget audience. Also, the sales in the winter are already good so they should focus on increasing sales in the summer/rest of the months. Some incentives such as discounts or special offers is encouraged. Lastly, price of the competitor affects the sales so competitor's price hikes should be actually beneficial for the sales of Progresso soups.
+
+
+***Problem 2: Bank Marketing***
+```{r}
+
+bank <- read.csv("https://raw.githubusercontent.com/jcbonilla/BusinessAnalytics/master/BAData/bank_marketing.csv")
+head(bank, 10)
+
+```
+**1. Run 2 models that predict the subscription of a term deposit**
+
+```{r}
+
+bank$housemaid <- as.logical(0)
+bank$services <- as.logical(0)
+bank$admin. <- as.logical(0)
+bank$blue_collar <- as.logical(0)
+bank$technician <- as.logical(0)
+bank$retired <- as.logical(0)
+bank$management <- as.logical(0)
+bank$self_employed <- as.logical(0)
+bank$unknown <- as.logical(0)
+bank$entrepreneur <- as.logical(0)
+bank$unemployed <- as.logical(0)
+bank$student <- as.logical(0)
+
+for (i in 1:nrow(bank)){
+  if (bank$job[i] == "housemaid")
+    bank$housemaid[i] <- as.logical(1)
+  else if (bank$job[i] == "services")
+    bank$services[i] <- as.logical(1)
+  else if (bank$job[i] == "admin.")
+    bank$admin.[i] <- as.logical(1)
+  else if (bank$job[i] == "blue-collar")
+    bank$blue_collar[i] <- as.logical(1)
+  else if (bank$job[i] == "technician")
+    bank$technician[i] <- as.logical(1)
+  else if (bank$job[i] == "retired")
+    bank$retired[i] <- as.logical(1)
+  else if (bank$job[i] == "management")
+    bank$management[i] <- as.logical(1)
+  else if (bank$job[i] == "self-employed")
+    bank$self_employed[i] <- as.logical(1)
+  else if (bank$job[i] == "unknown")
+    bank$unknown[i] <- as.logical(1)
+  else if (bank$job[i] == "entrepreneur")
+    bank$entrepreneur[i] <- as.logical(1)
+  else if (bank$job[i] == "unemployed")
+    bank$unemployed[i] <- as.logical(1)
+  else if (bank$job[i] == "student")
+    bank$student[i] <- as.logical(1)
+}
+
+head(bank,10)
+```
+
+```{r}
+
+bankModel1 <- glm(family = "binomial", data= bank, y ~ age + job + marital + education + default + housing + loan + contact + month + day_of_week + duration + campaign + pdays + previous + poutcome)
+
+summary(bankModel1)
+
+```
+```{r}
+
+bankModel2 <- lm(data= bank, as.numeric(y) ~ as.numeric(age) + as.numeric(job) + as.numeric(marital) + as.numeric(education) + as.numeric(default) + as.numeric(housing) + as.numeric(loan) + as.numeric(contact) + as.numeric(month) + as.numeric(day_of_week) + as.numeric(duration) + as.numeric(campaign) + as.numeric(pdays) + as.numeric(previous) + as.numeric(poutcome))
+
+summary(bankModel2)
+
+```
+
+**2. Create an appropriate split and validate your models using ratio of correct predictions vs total predictions.**
+
+```{r echo= FALSE}
+
+library(rpart)
+set.seed(100) 
+split_rate <- (.66)
+split <- sample(1:nrow(bank), size= nrow(bank)*split_rate)
+
+#trainingRowIndex <- sample(1:nrow(bank),(split)*nrow(bank)) 
+trainingData <- bank[split, ]
+testData <- bank[-split, ]
+
+bankModel1 <- rpart(y ~ .,data= trainingData, method= "class")
+bankModel1
+
+response <- predict(bankModel1, testData, type= "class")
+
+t <- data.frame(Actual = testData$y , Prediction = response)
+t <- table(t)
+t
+
+```
+
+**3. Asses your model using performance metrics such as accuracy, precision, recall, F-score and G-score.**
+
+```{r}
+
+accuracy <- (t[1,1] + t[2,2])/sum(t)
+accuracy
+
+precision <- (t[2,2]/(t[2,2] + t[1,2]))
+precision
+
+recall <- (t[2,2]/(t[2,2] + t[2,1]))
+recall
+
+f_score <- 2*((precision*recall)/(precision+recall))
+f_score
+
+g_score <- sqrt(precision*recall)
+g_score
+
+```
+
+**4. Choose one model and provide actionable recommendations to the marketing department.**
+
+As the model 1 have already accomodated the catagorical variables, model 1 is definately better than model 2 and so I chose to move forward with the model 1.
+
+Recommandations:
+
+1). Targetting students and retired people may be benificial as their coefficient are statistically significant as well as positive.
+
+2). Call duration more than 5 minutes are more likely to convince people to make long-term deposits with the bank.
+
+3). Months like March, April, December have seen most conversions.
+
+4). Days on which the target customers should be called are also important. Generally cutromers tend to convert  at the beginning or the end of the month.
+
+***Problem 3: Car Evaluation Data***
+
+**1. Run a model to predict if a car would get accepted or not.**
+
+```{r}
+
+car <- read.csv("https://raw.githubusercontent.com/jcbonilla/BusinessAnalytics/master/BAData/car-data.csv")
+
+set.seed(104)
+split_rate2 <- 0.8
+split2 <- sample(1:nrow(car),split_rate2 * nrow(car))
+
+trainingData2 <- car[split2,]
+testData2 <- car[-split2,]
+carModel <- rpart(trainingData2$Car.Acceptability ~ . , trainingData2, method= "class")
+carModel
+
+response2 <- predict(carModel, testData2, type = "class")
+response2
+summary(response2)
+
+```
+**2. Create 80:20 split and validate your model using ratio of correct predictions vs total predictions.**
+
+```{r}
+
+p <- data.frame(Actual = testData2$Car.Acceptability, Predict= response2)
+q <- table(p)
+q
+
+```
+**3. Asses your model using various performance metrics such accuracy, precision, recall, F-score and G-score.**
+
+```{r}
+
+accuracy <- (q[1,1] + q[2,2])/sum(q)
+accuracy
+
+precision <- (q[1,1]/(q[1,1] + q[1,2]))
+precision
+
+recall <- (q[1,1]/(q[1,1] + q[2,1]))
+recall
+
+f_score <- 2*((precision*recall)/(precision+recall))
+f_score
+
+g_score <- sqrt(precision*recall)
+g_score
+```
+
+**4. Using your acceptance results from the model, how would you suggest a strategy for cars in a used car seller lot. What types of cars should they have, what should be the compensation of the fleet?**
+
+Cars with seating capacity of 4-6 generally sell better. If the car has large boot space they tend to be acceptable to the market. Additionally, cars with low maintainence costs tends to sell better than others.
+
+These results can be trusted as the accuracy and precision, both are high in the model constructed above. 
+
+As a result, the seller lot should have cars with low/medium maintainence costs with medium/big boot spaces with seating capacity between 4-6. The fleet compensation depends on the maintainence costs of the car as cars with low maintainence costs are prices high and vice versa.

@@ -1,0 +1,161 @@
+---
+title: "Business Analytics HW3"
+author: "Devarshi Pancholi"
+date: "9/19/2019"
+output:
+  pdf_document: default
+  word_document: default
+---
+
+***Problem 1: CitiBike anomaly detection & neighborhood usage.***\newline
+\newline
+***1. What anomalies detectable with tripduration and the age of the user**
+```{r}
+
+library(readr)
+Citi <- read_csv(file= "/Users/devarshipancholi/Desktop/Citi.csv")
+summary(Citi$tripMin)
+hist(Citi$tripduration, main= "Histogram of Trip Duration", xlab= "seconds", ylab= "Frequency", col= "grey", border= "blue")
+
+summary(Citi$Age)
+hist(Citi$Age, main= "Histogram for Age", xlab= "Age", ylab= "Frequency", col= "grey", border= "blue")
+
+```
+
+As we can see here, max values in both cases for Age and Tripduration here are unusual. They are clearly outliers which may have resulted here as a reason of false data input. Also 36,360 minutes for a single ride may suggest the bike must have been stolen.
+
+In case of Age, there seem to be about 2000 datapoints over the age of 60 as we can see from the histogram. While this may be possible, it is highly unlikely.\newline
+\newline
+\newline
+
+***2. Which neighborhoods have the highest demand in traffic usage. Conduct your exploratory data analysis using the relative number of departures by riders with annual memberships from Citi Bike stations that happen during \newline a. Morning \newline b. Evening \newline c. Alternative hours***
+```{r}
+library(lubridate)
+library(dplyr)
+
+Citi$Neighbourhood <- paste(Citi$'start station name')
+Citi %>% group_by(Neighbourhood) %>% summarize(count=n()) %>% arrange(desc(count)) %>% top_n(n=20)
+```
+
+```{r}
+
+library(ggplot2)
+Citi$time <- as.POSIXct(strptime(Citi$starttime,"%m/%d/%Y %H:%M"))
+Citi$hour <- as.factor(hour(Citi$time))
+ggplot(Citi) + geom_bar(aes(x=hour, y=(count)/sum(..count..), fill=usertype)) + theme_bw() + ylab("")
+
+```
+
+***3. Based on your anomalies analysis in (1) and geographical usage in (2), what recommendation would you provide to the CitiBike operators***\newline
+\newline
+Based on the above 2 analysis the recommendations are: \newline
+--> As there is a lot of false data in the 'Age' and Trip-duration' variables, special care should be taken that people enter corrert birth year while signing up.\newline
+--> Any data about a bike which comes in excess of 2 hours than expected time of return should be marked "Missing" or "Stolen"\newline
+--> Most of the popular neighbourhoods are in Jersey City rather than Manhatten. This suggests more attention should be paid towards maintainence and operations of citi bike stations in Jersey City.\newline
+--> As seen in the bar graph above, the busiest time segment is 7AM - 9AM in the morning and 5PM - 7PM in the evening. So more bikes should me maid available through that time slots, espicially in Jersey City.\newline
+--> Afternoons are usually busy compared to late nights or early mornings.\newline
+--> Contrary to our expectations, one-time customes use more bikes as compared to subscribers throughout the day. So, in order to convert those customers into subscribers, special offers or other incentives such as discounts, etc. should be made to them.\newline
+\newline
+\newline
+\newline
+***Problem 2: Aviation Accidents***\newline
+\newline
+***1. A visualization of fatal vs. non-fatal crashes in the US from the 1940s through 2013.***\newline
+```{r}
+
+library(readr)
+Ava <- read_csv("/Users/devarshipancholi/Downloads/aviation.csv")
+colnames(Ava)[colnames(Ava)=="Injury Severity"] <- "Injury"
+head(Ava, 10)
+
+```
+```{r}
+
+Ava.Grp <- group_by(Ava, Injury) 
+Ava.SUM <- summarise(Ava.Grp, Freq= n())
+Ava.SUMF <- top_n(Ava.SUM, n= 2)
+ggplot(Ava.SUMF,aes(x = Injury , y = Ava.SUMF$'Freq')) + geom_bar(stat = "identity") + theme_classic() +labs(x = "Fatalities",y = "Frequency", title = paste("Fatal V Non Fatal Accidents") )
+
+```
+\newline
+\newline
+\newline
+***2. An additional displays for:\newline a. Countries with most incidents ***
+```{r}
+
+Ava.Grp2 <- group_by(Ava, Country) 
+Ava.SUM2 <- summarise(Ava.Grp2, Freq2= n())
+Ava.SUM2F <- top_n(Ava.SUM2, n= 9)
+ggplot(Ava.SUM2F,aes(x = Country , y = Ava.SUM2F$'Freq2')) + geom_bar(stat = "identity") + theme_classic() +labs(x = "Countries",y = "Frequency", title = paste("Countries with most incidents") )
+
+```
+\newline
+***b. Historical deaths by year***
+```{r}
+
+Ava$'Year' <- format(as.Date(Ava$'Event Date', format="%d/%m/%Y"),"%Y")
+Ava$Year1 <- as.numeric(Ava$Year)
+hist(Ava$Year1, main= "Deaths by Year", xlab= "Year", ylab= "Frequency", col= "grey", border= "blue")
+
+```
+\newline
+\newline
+***Problem 3: Retail Targets***
+```{r message= FALSE, warning= FALSE}
+
+library(dplyr)
+Target <- read_csv("/Users/devarshipancholi/Downloads/HDLData.csv")
+head(Target, 10)
+Target.Set <- Target %>% filter(state == c("ME", "NY", "NJ", "VT", "MA", "RI", "CT", "NH", "PA"))
+Rest.US <- anti_join(Target, Target.Set)
+
+Target_Population_change <- 100*(sum(Target$pop_2010) - sum(Target$pop_2000))/sum(Target$pop_2000)
+
+Rest.US_Population_change <- 100*(sum(Rest.US$pop_2010) - sum(Rest.US$pop_2000))/sum(Rest.US$pop_2000)
+```
+```{r echo= FALSE}
+Target_income_change <- 100*(sum(Target$income_2010) - sum(Target$income_2000))/sum(Target$income_2000)
+
+Rest.US_income_change <- 100*(sum(Rest.US$income_2010) - sum(Rest.US$income_2000))/sum(Rest.US$income_2000)
+```
+```{r}
+Target_density_change <- 100*(sum(Target$density_2010) - sum(Target$density_2000))/sum(Target$density_2000)
+
+Rest.US_density_change <- 100*(sum(Rest.US$density_2010) - sum(Rest.US$density_2000))/sum(Rest.US$density_2000)
+```
+```{r echo= FALSE}
+Target_ownhome_change <- 100*(sum(Target$ownhome_2010) - sum(Target$ownhome_2000))/sum(Target$ownhome_2000)
+
+Rest.US_ownhome_change <- 100*(sum(Rest.US$ownhome_2010) -sum(Rest.US$ownhome_2000))/sum(Rest.US$ownhome_2000)
+```
+```{r}
+Target_u18_change <- 100*(sum(Target$pct_U18_2010) - sum(Target$pct_U18_2000))/sum(Target$pct_U18_2000)
+
+Rest.US_u18_change <- 100*(sum(Rest.US$pct_U18_2010)) - sum((Rest.US$pct_U18_2000))/sum(Rest.US$pct_U18_2000)
+```
+```{r echo= FALSE}
+Target_college_change <- 100*(sum(Target$pctcollege_2010) - sum(Target$pctcollege_2000))/sum(Target$pctcollege_2000)
+
+Rest.US_college_change <- 100*(sum(Rest.US$pctcollege_2010) - sum(Rest.US$pctcollege_2000))/sum(Rest.US$pctcollege_2000)
+```
+```{r}
+Target_white_change <- 100*(sum((Target$pctwhite_2010))- sum((Target$pctwhite_2000)))/sum((Target$pctwhite_2000))
+
+Rest.US_white_change <- 100*(sum((Rest.US$pctwhite_2010)) - sum((Rest.US$pctwhite_2000)))/sum((Rest.US$pctwhite_2000))
+```
+```{r echo= FALSE}
+Target_black_change <- 100*(sum((Target$pctblack_2010))- sum((Target$pctblack_2000)))/sum((Target$pctblack_2000))
+
+Rest.US_black_change <- 100*(sum((Rest.US$pctblack_2010)) - sum((Rest.US$pctblack_2000)))/sum((Rest.US$pctblack_2000))
+
+excluded_white_Rest.US <- (Rest.US$pctwhite_2000)
+
+Rest.US_white_change <- 100*(sum(Rest.US$pctwhite_2010) - sum(Rest.US$pctwhite_2000))/sum(Rest.US$pctwhite_2000)
+
+Target.Data = matrix(c(4.2045, 9.8067, 28.9417, 26.5045, 3.8115, 6.5958, 0, -2.250455, -11.4315,- 8.0676, 14.8924, 13.2039, -2.2436, -1.6276, -4.292683, -4.510274), ncol = 8)
+```
+```{r}
+barplot(Target.Data, main = "Pertange Change over 10 Years", xlab = "Percentage Change", ylab = "Measures", names.arg = c("Population","Population", "Density","Density", "U-18","U-18" ,"White", "White"), col = c("darkblue","red"), horiz = TRUE)
+
+```
+
