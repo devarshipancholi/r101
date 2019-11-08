@@ -1,0 +1,95 @@
+---
+title: "BA HW 6"
+author: "Devarshi Pancholi"
+date: "10/31/2019"
+output: pdf_document
+---
+
+***Problem 1: Student Application Data(Redo)***
+
+```{r}
+
+stu <- read.csv("https://raw.githubusercontent.com/jcbonilla/BusinessAnalytics/master/BAData/Univ%20Admissions.csv")
+head(stu,10)
+#View(stu)
+str(stu)
+```
+```{r}
+
+table(stu$x.Status.1)
+prop.table(table(stu$x.Status.1))
+barplot(table(stu$x.Status.1))
+
+stu$APPLICANT <- as.logical(0)
+stu$PROSPECT <- as.logical(0)
+stu$SUSPECT <- as.logical(0)
+
+for(i in 1:nrow(stu)) {
+  if (stu$x.Status.1[i]=="APPLICANT")
+    stu$APPLICANT[i] <- as.logical(1)
+  else if(stu$x.Status.1[i]=="PROSPECT")
+    stu$PROSPECT[i] <- as.logical(1)
+  else if(stu$x.Status.1[i]=="SUSPECT")
+    stu$SUSPECT[i] <- as.logical(1)
+}
+
+barplot(table(school$APPLICANT))
+```
+
+```{r}
+stu$isMale <- as.logical(0)
+for (i in 1:nrow(stu)) {
+  if (stu$x.Gender[i]=="Male")
+    stu$isMale[i] <- as.logical(1)
+  else if (stu$x.Gender[i]=="Female")
+    stu$isMale[i] <- as.logical(0)
+}
+
+stu$inState <- as.logical(0)
+for (i in 1:nrow(stu)) {
+  if (stu$x.InState[i]=="Y")
+    stu$isMale[i] <- as.logical(1)
+  else if (stu$x.InState[i]=="N")
+    stu$isMale[i] <- as.logical(0)
+}
+View(stu)
+```
+
+```{r}
+
+library(rpart)
+
+#model1 <- rpart(x.Status.1 ~ x.Country + x.State + x.Gender + x.Source + x.GPA + x.SAT_Score + x.DistancetoCampus_miles + x.HouseholdIncome + x.InState, data= stu, method= "class")
+
+set.seed(100) 
+split_rate <- (.66)
+split <- sample(1:nrow(stu), size= nrow(stu)*split_rate)
+
+trainingData <- stu[split, ]
+testData <- stu[-split, ]
+
+model1Val <- rpart(x.Status.1 ~ .,data= trainingData, method= "class")
+model1Val
+
+res <- predict(model1Val, testData, type= "class")
+
+p <- data.frame(Actual = testData$x.Status.1, Prediction = res)
+p <- table(t)
+p
+
+accuracy <- (p[1,1] + p[2,2])/sum(t)
+accuracy
+
+precision <- (p[2,2]/(p[2,2] + p[1,2]))
+precision
+
+recall <- (p[2,2]/(p[2,2] + p[2,1]))
+recall
+
+f_score <- 2*((precision*recall)/(precision+recall))
+f_score
+
+g_score <- sqrt(precision*recall)
+g_score
+
+```
